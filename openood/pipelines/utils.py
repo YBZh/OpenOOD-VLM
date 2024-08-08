@@ -3,6 +3,7 @@ from openood.utils import Config
 from .feat_extract_pipeline import FeatExtractPipeline
 from .feat_extract_opengan_pipeline import FeatExtractOpenGANPipeline
 from .finetune_pipeline import FinetunePipeline
+from .train_fsood_pipeline import TrainFSOODPipeline
 from .test_acc_pipeline import TestAccPipeline
 from .test_ad_pipeline import TestAdPipeline
 from .test_ood_pipeline import TestOODPipeline
@@ -28,7 +29,9 @@ def get_pipeline(config: Config):
         'train_oe': TrainOEPipeline,
         'train_opengan': TrainOpenGanPipeline,
         'train_arplgan': TrainARPLGANPipeline,
-        'test_ood_aps': TestOODPipelineAPS
+        'test_ood_aps': TestOODPipelineAPS,
+        ###########
+        'train_fsood': TrainFSOODPipeline
     }
 
     return pipelines[config.pipeline.name](config)

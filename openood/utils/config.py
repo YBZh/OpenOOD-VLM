@@ -3,7 +3,7 @@ import os
 import re
 
 import yaml
-
+import pdb
 
 def setup_config(config_process_order=('merge', 'parse_args', 'parse_refs')):
     """Parsing configuration files and command line augments.

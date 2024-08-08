@@ -19,7 +19,7 @@ class TestAdPipeline:
 
         # init network
         net = get_network(self.config.network)
-
+        
         # init evaluator
         evaluator = get_evaluator(self.config)
 

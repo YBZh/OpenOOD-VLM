@@ -1,7 +1,17 @@
 postprocessor:
   name: mcm
-  APS_mode: False
+  APS_mode: True  # search for the best.
   postprocessor_args:
-    tau: 1
+    tau: 1.0
+    beta: 5.5
+    localindice: 5
+    thres: 0.8
+    gap: 0.0
+    memleng: 30
+    lambdaval: 1.0
+    group_num: 1
+    random_permute: True
+    in_score: sum
+    samada: True
   postprocessor_sweep:
-    tau_list: [0.01, 1, 10]
+    tau_list: [0.7, 1, 1.5]

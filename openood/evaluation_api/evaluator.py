@@ -16,7 +16,7 @@ from openood.networks.react_net import ReactNet
 from .datasets import DATA_INFO, data_setup, get_id_ood_dataloader
 from .postprocessor import get_postprocessor
 from .preprocessor import get_default_preprocessor
-
+import ipdb
 
 class Evaluator:
     def __init__(
@@ -116,6 +116,7 @@ class Evaluator:
 
         # postprocessor setup
         postprocessor.setup(net, dataloader_dict['id'], dataloader_dict['ood'])
+        # ipdb.set_trace()
 
         self.id_name = id_name
         self.net = net
@@ -173,7 +174,7 @@ class Evaluator:
             for batch in tqdm(data_loader, desc=msg, disable=not progress):
                 data = batch['data'].cuda()
                 logits = self.net(data)
-                preds = logits.argmax(1)
+                preds = logits.argmax(1)  ## use logits directly for accuracy calculation.
                 all_preds.append(preds.cpu())
                 all_labels.append(batch['label'])
 
@@ -205,11 +206,9 @@ class Evaluator:
                 return self.metrics['csid_acc']
             else:
                 correct, total = 0, 0
-                for _, (dataname, dataloader) in enumerate(
-                        self.dataloader_dict['csid'].items()):
+                for _, (dataname, dataloader) in enumerate(self.dataloader_dict['csid'].items()):
                     if self.scores['csid_preds'][dataname] is None:
-                        all_preds, all_labels = self._classifier_inference(
-                            dataloader, f'CSID {dataname} Acc Eval')
+                        all_preds, all_labels = self._classifier_inference(dataloader, f'CSID {dataname} Acc Eval')
                         self.scores['csid_preds'][dataname] = all_preds
                         self.scores['csid_labels'][dataname] = all_labels
                     else:
@@ -241,6 +240,7 @@ class Evaluator:
             raise ValueError(f'Unknown data name {data_name}')
 
     def eval_ood(self, fsood: bool = False, progress: bool = True):
+
         id_name = 'id' if not fsood else 'csid'
         task = 'ood' if not fsood else 'fsood'
         if self.metrics[task] is None:
@@ -323,11 +323,11 @@ class Evaluator:
                   id_list: List[np.ndarray],
                   ood_split: str = 'near',
                   progress: bool = True):
+
         print(f'Processing {ood_split} ood...', flush=True)
         [id_pred, id_conf, id_gt] = id_list
         metrics_list = []
-        for dataset_name, ood_dl in self.dataloader_dict['ood'][
-                ood_split].items():
+        for dataset_name, ood_dl in self.dataloader_dict['ood'][ood_split].items():
             if self.scores['ood'][ood_split][dataset_name] is None:
                 print(f'Performing inference on {dataset_name} dataset...',
                       flush=True)
@@ -354,6 +354,7 @@ class Evaluator:
             metrics_list.append(ood_metrics)
             self._print_metrics(ood_metrics)
 
+ 
         print('Computing mean metrics...', flush=True)
         metrics_list = np.array(metrics_list)
         metrics_mean = np.mean(metrics_list, axis=0, keepdims=True)
@@ -380,6 +381,7 @@ class Evaluator:
         hyperparam_list = []
         count = 0
 
+        # ipdb.set_trace()
         for name in self.postprocessor.args_dict.keys():
             hyperparam_names.append(name)
             count += 1

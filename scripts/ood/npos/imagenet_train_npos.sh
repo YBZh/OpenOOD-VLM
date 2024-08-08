@@ -14,7 +14,7 @@ python main.py \
     --network.backbone.checkpoint ./results/pretrained_weights/resnet50_imagenet1k_v1.pth \
     --optimizer.lr 0.001 \
     --optimizer.num_epochs 30 \
-    --dataset.train.batch_size 128 \
+    --dataset.train.batch_size 48 \
     --trainer.trainer_args.temp 0.1 \
     --trainer.trainer_args.sample_from 1000 \
     --trainer.trainer_args.K 400 \

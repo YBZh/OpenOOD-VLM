@@ -11,7 +11,7 @@ from openood.postprocessors import (
     Rd4adPostprocessor, ReactPostprocessor, ResidualPostprocessor, SSDPostprocessor,
     TemperatureScalingPostprocessor, VIMPostprocessor, RotPredPostprocessor, RankFeatPostprocessor,
     RMDSPostprocessor, SHEPostprocessor, CIDERPostprocessor, NPOSPostprocessor, GENPostprocessor,
-    NNGuidePostprocessor, RelationPostprocessor)
+    NNGuidePostprocessor, RelationPostprocessor, MCMPostprocessor)
 from openood.utils.config import Config, merge_configs
 
 postprocessors = {
@@ -19,6 +19,7 @@ postprocessors = {
     'cider': CIDERPostprocessor,
     'conf_branch': ConfBranchPostprocessor,
     'msp': BasePostprocessor,
+    'mcm': MCMPostprocessor,
     'ebo': EBOPostprocessor,
     'odin': ODINPostprocessor,
     'mds': MDSPostprocessor,

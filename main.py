@@ -32,7 +32,6 @@ if __name__ == '__main__':
 
     # pipeline = get_pipeline(config)
     # pipeline.run()
-
     launch(
         main,
         config.num_gpus,

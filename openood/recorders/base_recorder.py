@@ -14,13 +14,22 @@ class BaseRecorder:
 
         self.begin_time = time.time()
         self.output_dir = config.output_dir
+        
+    ## original
+    # def report(self, train_metrics, val_metrics):
+    #     print('\nEpoch {:03d} | Time {:5d}s | Train Loss {:.4f} | '
+    #           'Val Loss {:.3f} | Val Acc {:.2f}'.format(
+    #               (train_metrics['epoch_idx']),
+    #               int(time.time() - self.begin_time), train_metrics['loss'],
+    #               val_metrics['loss'], 100.0 * val_metrics['acc']),
+    #           flush=True)
 
     def report(self, train_metrics, val_metrics):
         print('\nEpoch {:03d} | Time {:5d}s | Train Loss {:.4f} | '
-              'Val Loss {:.3f} | Val Acc {:.2f}'.format(
+              ' Val Acc {:.2f}'.format(
                   (train_metrics['epoch_idx']),
                   int(time.time() - self.begin_time), train_metrics['loss'],
-                  val_metrics['loss'], 100.0 * val_metrics['acc']),
+                  100.0 * val_metrics['acc']),
               flush=True)
 
     def save_model(self, net, val_metrics):
@@ -49,17 +58,19 @@ class BaseRecorder:
             self.best_acc = val_metrics['acc']
             torch.save(state_dict, os.path.join(self.output_dir, 'best.ckpt'))
 
-            save_fname = 'best_epoch{}_acc{:.4f}.ckpt'.format(
-                self.best_epoch_idx, self.best_acc)
-            save_pth = os.path.join(self.output_dir, save_fname)
-            torch.save(state_dict, save_pth)
-
-        # save last path
-        if val_metrics['epoch_idx'] == self.config.optimizer.num_epochs:
-            save_fname = 'last_epoch{}_acc{:.4f}.ckpt'.format(
-                val_metrics['epoch_idx'], val_metrics['acc'])
-            save_pth = os.path.join(self.output_dir, save_fname)
-            torch.save(state_dict, save_pth)
+            ## only save the best.ckpt to save space.
+            # save_fname = 'best_epoch{}_acc{:.4f}.ckpt'.format(
+            #     self.best_epoch_idx, self.best_acc)
+            # save_pth = os.path.join(self.output_dir, save_fname)
+            # torch.save(state_dict, save_pth)
+            
+        ## only save the best.ckpt to save space.
+        # # save last path
+        # if val_metrics['epoch_idx'] == self.config.optimizer.num_epochs:
+        #     save_fname = 'last_epoch{}_acc{:.4f}.ckpt'.format(
+        #         val_metrics['epoch_idx'], val_metrics['acc'])
+        #     save_pth = os.path.join(self.output_dir, save_fname)
+        #     torch.save(state_dict, save_pth)
 
     def summary(self):
         print('Training Completed! '

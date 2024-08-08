@@ -3,6 +3,7 @@ import os
 import zipfile
 
 import gdown
+import ipdb
 
 benchmarks_dict = {
     'bimcv': [
@@ -128,7 +129,7 @@ def download_dataset(dataset, args):
     else:
         print('Invalid dataset detected {}'.format(dataset))
         return
-
+    # ipdb.set_trace()
     if require_download(dataset, store_path):
         print(store_path)
         if not store_path.endswith('/'):

@@ -4,7 +4,7 @@ from openood.networks import get_network
 from openood.recorders import get_recorder
 from openood.trainers import get_trainer
 from openood.utils import setup_logger
-
+import pdb
 
 class FinetunePipeline:
     def __init__(self, config) -> None:
@@ -23,7 +23,7 @@ class FinetunePipeline:
         net = get_network(self.config.network)
 
         # init trainer and evaluator
-        trainer = get_trainer(net, train_loader, self.config)
+        trainer = get_trainer(net, train_loader, val_loader, self.config)
         evaluator = get_evaluator(self.config)
 
         # init recorder

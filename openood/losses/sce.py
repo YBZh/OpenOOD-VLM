@@ -1,5 +1,5 @@
 import torch
-
+import pdb
 
 class SoftCrossEntropyFunction(torch.autograd.Function):
     @staticmethod
@@ -31,6 +31,7 @@ class SoftCrossEntropyFunction(torch.autograd.Function):
             weighted_label = label * weight.view(size)
         ctx.save_for_backward(weighted_label, prob)
         out = (neg_log_prob * weighted_label).sum(dim - 1)
+        # pdb.set_trace()
         return out
 
     @staticmethod
