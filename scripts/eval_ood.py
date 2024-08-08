@@ -22,8 +22,6 @@ from openood.networks.csi_net import CSINet
 from openood.networks.udg_net import UDGNet
 from openood.networks.cider_net import CIDERNet
 from openood.networks.npos_net import NPOSNet
-from openood.networks.palm_net import PALMNet
-from openood.networks.t2fnorm_net import T2FNormNet
 
 
 def update(d, u):
@@ -110,7 +108,7 @@ for subfolder in sorted(glob(os.path.join(root, 's*'))):
         net = UDGNet(backbone=backbone,
                      num_classes=num_classes,
                      num_clusters=1000)
-    elif postprocessor_name in ['cider', 'reweightood']:
+    elif postprocessor_name == 'cider':
         backbone = model_arch(num_classes=num_classes)
         net = CIDERNet(backbone,
                        head='mlp',
@@ -122,16 +120,6 @@ for subfolder in sorted(glob(os.path.join(root, 's*'))):
                       head='mlp',
                       feat_dim=128,
                       num_classes=num_classes)
-    elif postprocessor_name == 'palm':
-        backbone = model_arch(num_classes=num_classes)
-        net = PALMNet(backbone,
-                      head='mlp',
-                      feat_dim=128,
-                      num_classes=num_classes)
-        postprocessor_name = 'mds'
-    elif postprocessor_name == 't2fnorm':
-        backbone = model_arch(num_classes=num_classes)
-        net = T2FNormNet(backbone=backbone, num_classes=num_classes)
     else:
         net = model_arch(num_classes=num_classes)
 

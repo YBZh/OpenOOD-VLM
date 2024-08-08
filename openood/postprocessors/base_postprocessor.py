@@ -7,7 +7,6 @@ from torch.utils.data import DataLoader
 
 import openood.utils.comm as comm
 
-
 class BasePostprocessor:
     def __init__(self, config):
         self.config = config

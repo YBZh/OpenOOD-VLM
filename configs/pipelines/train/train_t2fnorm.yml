@@ -1,25 +1,29 @@
-exp_name: "'@{dataset.name}'_'@{network.name}'_'@{trainer.name}'_e'@{optimizer.num_epochs}'_lr'@{optimizer.lr}'_alpha'@{trainer.trainer_args.tau}'_'@{mark}'/s'@{seed}'"
+exp_name: "'@{dataset.name}'_'@{network.name}'_'@{trainer.name}'_e'@{optimizer.num_epochs}'_lr'@{optimizer.lr}'_tau'@{network.tau}'_'@{mark}'"
 output_dir: ./results/
 save_output: True
+force_merge: False
 merge_option: default
-mark: default
-seed: 0
+mark: T2FNorm
+seed: 42
 
 num_gpus: 1
-num_workers: 8
+num_workers: 4
 num_machines: 1
 machine_rank: 0
 
 preprocessor:
   name: base
 
+network:
+  pretrained: False
+  modification: t2fnorm
+  tau: 0.1
+
 pipeline:
   name: train
 
 trainer:
-  name: t2fnorm
-  trainer_args:
-    tau: 0.1
+  name: base
 
 evaluator:
   name: base

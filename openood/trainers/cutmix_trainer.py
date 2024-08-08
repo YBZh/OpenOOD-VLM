@@ -9,7 +9,7 @@ import openood.utils.comm as comm
 from openood.utils import Config
 
 from .lr_scheduler import cosine_annealing
-
+import pdb
 
 class CutMixTrainer:
     def __init__(self, net: nn.Module, train_loader: DataLoader,
@@ -37,6 +37,8 @@ class CutMixTrainer:
                 1e-6 / config.optimizer.lr,
             ),
         )
+    def setup(self):
+        pass 
 
     def train_epoch(self, epoch_idx):
         self.net.train()
@@ -57,6 +59,7 @@ class CutMixTrainer:
             # perform cutmix augmentation in a batch
             r = np.random.rand(1)
             if self.args.beta > 0 and r < self.args.cutmix_prob:
+                # pdb.set_trace()
                 # generate mixed sample
                 lam = np.random.beta(self.args.beta, self.args.beta)
                 rand_index = torch.randperm(data.size()[0]).cuda()

@@ -9,7 +9,7 @@ from .fsood_evaluator import FSOODEvaluator
 from .ood_evaluator import OODEvaluator
 from .osr_evaluator import OSREvaluator
 from .patchcore_evaluator import PatchCoreEvaluator
-
+from .fsood_evaluator_clip import FSOODEvaluatorClip, OODEvaluatorClip, OODEvaluatorClipTTA
 
 def get_evaluator(config: Config):
     evaluators = {
@@ -21,6 +21,9 @@ def get_evaluator(config: Config):
         'ad': ADEvaluator,
         'mos': MOSEvaluator,
         'ece': ECEEvaluator,
-        'osr': OSREvaluator
+        'osr': OSREvaluator,
+        'fsood_clip': FSOODEvaluatorClip,
+        'ood_clip': OODEvaluatorClip,
+        'ood_clip_tta': OODEvaluatorClipTTA
     }
     return evaluators[config.evaluator.name](config)

@@ -10,13 +10,15 @@ from torch.utils.data import DataLoader
 from openood.postprocessors import BasePostprocessor
 
 from .ood_evaluator import OODEvaluator
-
+import pdb
 
 class FSOODEvaluator(OODEvaluator):
     def eval_csid_acc(self, net: nn.Module,
                       csid_loaders: Dict[str, Dict[str, DataLoader]]):
         # ensure the networks in eval mode
         net.eval()
+        # pdb.set_trace()
+
         for dataset_name, csid_dl in csid_loaders.items():
             print(f'Computing accuracy on {dataset_name} dataset...')
             correct = 0
@@ -77,8 +79,7 @@ class FSOODEvaluator(OODEvaluator):
         for dataset_name, csid_dl in ood_data_loaders['csid'].items():
             print(f'Performing inference on {dataset_name} dataset...',
                   flush=True)
-            csid_pred, csid_conf, csid_gt = postprocessor.inference(
-                net, csid_dl)
+            csid_pred, csid_conf, csid_gt = postprocessor.inference(net, csid_dl)
             if self.config.recorder.save_scores:
                 self._save_scores(csid_pred, csid_conf, csid_gt, dataset_name)
             id_pred = np.concatenate([id_pred, csid_pred])

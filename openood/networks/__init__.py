@@ -1,8 +1,11 @@
 from .ash_net import ASHNet
-try:
-    from .clip import CLIPZeroshot
-except ModuleNotFoundError:
-    pass
+# try:
+#     from .clip import CLIPZeroshot
+# except ModuleNotFoundError:
+#     pass
+from .clip_coop import CoOp
+from .clip_fixed import FixedCLIP
+from .clip_openood import CLIPZeroshot
 from .densenet import DenseNet3
 # from .mmcls_featext import ImageClassifierWithReturnFeature
 from .resnet18_32x32 import ResNet18_32x32

@@ -1,0 +1,21 @@
+network:
+  name: fixedclip
+  num_classes: '@{dataset.num_classes}'
+  pretrained: False  # In training pipeline:"False"; In testing pipeline:"True"
+  num_gpus: '@{num_gpus}'
+  checkpoint: none
+
+  feat_dim: 128
+  head: mlp
+
+  backbone:
+    name: ViT-B/16
+    num_classes: '@{dataset.num_classes}' # 1000
+    dataset: '@{dataset.name}' # imagenet
+    text_prompt: simple # simple | tip | full | *_cupl
+    text_center: True
+    ood_number: 1000
+    image_size: '@{dataset.image_size}'
+    pretrained: False
+    checkpoint: none
+    num_gpus: '@{num_gpus}'

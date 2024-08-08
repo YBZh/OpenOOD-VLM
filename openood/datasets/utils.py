@@ -12,7 +12,7 @@ from .imglist_dataset import ImglistDataset
 from .imglist_augmix_dataset import ImglistAugMixDataset
 from .imglist_extradata_dataset import ImglistExtraDataDataset, TwoSourceSampler
 from .udg_dataset import UDGDataset
-
+import pdb
 
 def get_dataloader(config: Config):
     # prepare a dataloader dictionary
@@ -67,13 +67,25 @@ def get_dataloader(config: Config):
                                     sampler=sampler)
         else:
             CustomDataset = eval(split_config.dataset_class)
-            dataset = CustomDataset(
-                name=dataset_config.name + '_' + split,
-                imglist_pth=split_config.imglist_pth,
-                data_dir=split_config.data_dir,
-                num_classes=dataset_config.num_classes,
-                preprocessor=preprocessor,
-                data_aux_preprocessor=data_aux_preprocessor)
+            # pdb.set_trace()
+            if split_config.few_shot:
+                dataset = CustomDataset(
+                    name=dataset_config.name + '_' + split,
+                    imglist_pth=split_config.imglist_pth,
+                    data_dir=split_config.data_dir,
+                    num_classes=dataset_config.num_classes,
+                    preprocessor=preprocessor,
+                    data_aux_preprocessor=data_aux_preprocessor,
+                    few_shot=split_config.few_shot,
+                    randseed=config.seed)
+            else:
+                dataset = CustomDataset(
+                    name=dataset_config.name + '_' + split,
+                    imglist_pth=split_config.imglist_pth,
+                    data_dir=split_config.data_dir,
+                    num_classes=dataset_config.num_classes,
+                    preprocessor=preprocessor,
+                    data_aux_preprocessor=data_aux_preprocessor)
             sampler = None
             if dataset_config.num_gpus * dataset_config.num_machines > 1:
                 sampler = torch.utils.data.distributed.DistributedSampler(
@@ -114,6 +126,7 @@ def get_ood_dataloader(config: Config):
                                     num_workers=ood_config.num_workers)
             dataloader_dict[split] = dataloader
         else:
+            # pdb.set_trace()
             # dataloaders for csid, nearood, farood
             sub_dataloader_dict = {}
             for dataset_name in split_config.datasets:

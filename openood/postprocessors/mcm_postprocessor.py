@@ -13,6 +13,7 @@ class MCMPostprocessor(BasePostprocessor):
         super(MCMPostprocessor, self).__init__(config)
         self.args = self.config.postprocessor.postprocessor_args
         self.tau = self.args.tau
+        self.args_dict = self.config.postprocessor.postprocessor_sweep
 
     @torch.no_grad()
     def postprocess(self, net: nn.Module, data: Any):

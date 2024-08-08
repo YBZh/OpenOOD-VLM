@@ -1,5 +1,5 @@
 exp_name: "'@{dataset.name}'_'@{network.name}'_'@{pipeline.name}'_'@{evaluator.name}'_'@{postprocessor.name}'_'@{mark}'"
-output_dir: ./results/
+output_dir: ./results_fixedclip/
 save_output: True
 merge_option: default # disabled if 'save_output' is False
 mark: default # to mark the version of experiment
@@ -17,6 +17,7 @@ pipeline:
 
 evaluator:
   name: fsood
+  ood_scheme: ood
 
 recorder:
   save_scores: True

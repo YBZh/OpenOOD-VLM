@@ -36,9 +36,6 @@ class ReactPostprocessor(BasePostprocessor):
         else:
             pass
 
-        self.threshold = np.percentile(self.activation_log.flatten(),
-                                       self.percentile)
-
     @torch.no_grad()
     def postprocess(self, net: nn.Module, data: Any):
         output = net.forward_threshold(data, self.threshold)

@@ -18,3 +18,4 @@ configs/pipelines/test/test_draem.yml \
 configs/preprocessors/draem_preprocessor.yml \
 configs/postprocessors/draem.yml \
 --network.pretrained True \
+

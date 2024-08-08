@@ -12,7 +12,6 @@ from openood.evaluators.metrics import compute_all_metrics
 from openood.postprocessors import BasePostprocessor
 from openood.networks.ash_net import ASHNet
 from openood.networks.react_net import ReactNet
-from openood.networks.scale_net import ScaleNet
 
 from .datasets import DATA_INFO, data_setup, get_id_ood_dataloader
 from .postprocessor import get_postprocessor
@@ -114,8 +113,6 @@ class Evaluator:
             net = ReactNet(net)
         elif postprocessor_name == 'ash':
             net = ASHNet(net)
-        elif postprocessor_name == 'scale':
-            net = ScaleNet(net)
 
         # postprocessor setup
         postprocessor.setup(net, dataloader_dict['id'], dataloader_dict['ood'])

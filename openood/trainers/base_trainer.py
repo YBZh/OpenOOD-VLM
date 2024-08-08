@@ -36,6 +36,8 @@ class BaseTrainer:
                 1e-6 / config.optimizer.lr,
             ),
         )
+    def setup(self):
+        pass 
 
     def train_epoch(self, epoch_idx):
         self.net.train()

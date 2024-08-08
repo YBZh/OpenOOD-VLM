@@ -11,7 +11,7 @@ from openood.utils import Config
 
 from .base_evaluator import BaseEvaluator
 from .metrics import compute_all_metrics
-
+import pdb
 
 class OODEvaluator(BaseEvaluator):
     def __init__(self, config: Config):
@@ -39,7 +39,8 @@ class OODEvaluator(BaseEvaluator):
         assert 'test' in id_data_loaders, \
             'id_data_loaders should have the key: test!'
         dataset_name = self.config.dataset.name
-
+        
+        pdb.set_trace()
         if self.config.postprocessor.APS_mode:
             assert 'val' in id_data_loaders
             assert 'val' in ood_data_loaders
@@ -89,10 +90,12 @@ class OODEvaluator(BaseEvaluator):
         print(f'Processing {ood_split}...', flush=True)
         [id_pred, id_conf, id_gt] = id_list
         metrics_list = []
+        # pdb.set_trace()
         for dataset_name, ood_dl in ood_data_loaders[ood_split].items():
             print(f'Performing inference on {dataset_name} dataset...',
                   flush=True)
             ood_pred, ood_conf, ood_gt = postprocessor.inference(net, ood_dl)
+            # pdb.set_trace()
             ood_gt = -1 * np.ones_like(ood_gt)  # hard set to -1 as ood
             if self.config.recorder.save_scores:
                 self._save_scores(ood_pred, ood_conf, ood_gt, dataset_name)
@@ -141,6 +144,38 @@ class OODEvaluator(BaseEvaluator):
             ood_metrics = compute_all_metrics(conf, label, pred)
             val_auroc = ood_metrics[1]
         return {'auroc': 100 * val_auroc}
+
+    def eval_ood_val_accname(self, net: nn.Module, id_data_loaders: Dict[str,
+                                                                 DataLoader],
+                     ood_data_loaders: Dict[str, DataLoader],
+                     postprocessor: BasePostprocessor, epoch_idx: int = -1):
+        if type(net) is dict:
+            for subnet in net.values():
+                subnet.eval()
+        else:
+            net.eval()
+        assert 'val' in id_data_loaders
+        assert 'val' in ood_data_loaders
+        if self.config.postprocessor.APS_mode:
+            val_auroc = self.hyperparam_search(net, id_data_loaders['val'],
+                                               ood_data_loaders['val'],
+                                               postprocessor)
+        else:
+            id_pred, id_conf, id_gt = postprocessor.inference(
+                net, id_data_loaders['val'])
+            ood_pred, ood_conf, ood_gt = postprocessor.inference(
+                net, ood_data_loaders['val'])
+            ood_gt = -1 * np.ones_like(ood_gt)  # hard set to -1 as ood
+            pred = np.concatenate([id_pred, ood_pred])
+            conf = np.concatenate([id_conf, ood_conf])
+            label = np.concatenate([id_gt, ood_gt])
+            ood_metrics = compute_all_metrics(conf, label, pred)
+            val_auroc = ood_metrics[1]
+        
+        metrics = {}
+        metrics['acc'] = val_auroc
+        metrics['epoch_idx'] = epoch_idx
+        return metrics
 
     def _save_csv(self, metrics, dataset_name):
         [fpr, auroc, aupr_in, aupr_out, accuracy] = metrics

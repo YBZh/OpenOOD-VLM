@@ -1,0 +1,25 @@
+network:
+  name: maple
+  num_classes: '@{dataset.num_classes}'
+  pretrained: False # In training pipeline:"False"; In testing pipeline:"True"
+  num_gpus: '@{num_gpus}'
+  checkpoint: none
+
+  feat_dim: 128
+  head: mlp
+
+  backbone:
+    name: ViT-B/16
+    num_classes: '@{dataset.num_classes}' # 1000
+    dataset: '@{dataset.name}' # imagenet
+    text_prompt: simple
+    image_size: '@{dataset.image_size}'
+    N_CTX: 16
+    CTX_INIT: ''
+    PROMPT_DEPTH: 5  # 1-12
+    OOD_NUM: 1  # number of ood prompts
+    CSC: False
+    CLASS_TOKEN_POSITION: end
+    pretrained: True
+    checkpoint: none
+    num_gpus: '@{num_gpus}'

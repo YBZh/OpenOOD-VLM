@@ -1,0 +1,67 @@
+exp_name: "'@{dataset.name}'_'@{network.name}'_'@{trainer.name}'_'@{optimizer.name}'_e'@{optimizer.num_epochs}'_lr'@{optimizer.lr}'_'@{mark}'/s'@{seed}'"
+output_dir: ./our_results/
+save_output: True
+merge_option: default
+mark: default
+seed: 0
+
+num_gpus: 1
+num_workers: 1
+num_machines: 1
+machine_rank: 0
+
+preprocessor:
+  name: base
+
+pipeline:
+  name: train_fsood
+
+trainer:
+  name: base
+  trainer_args:
+    alpha: 0.2         # 0.2 for mixup, and 20 for regmixup.
+    beta: 1.0          # 1.0 for cutmix
+    cutmix_prob: 1.0   # cutmix probability
+    mix_strategy: mixup
+    loss_components: classification
+    queue_capacity: 500
+    iter_recompuration: 100
+    total_gs_num: 1000
+    selected_gs_num: 10
+    gs_loss_weight: 1-1-1-1
+    gs_flag: False
+    pre_queue: False
+    soft_split: False
+    proto_m: 0.95
+    temp: 0.1
+    sample_number: 1000
+    sample_from: 600
+    start_epoch_KNN: 40
+    K: 300
+    cov_mat: 0.1
+    select: 200
+    ID_points_num: 200
+    pick_nums: 2
+    w_disp: 0.5
+    w_comp: 1
+    loss_weight: 0.1
+
+evaluator:
+  name: fsood
+
+optimizer:
+  name: sgd
+  num_epochs: 100
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0001
+  warm: True
+  cosine: True
+  lr_decay_rate: 0.1
+  lr_decay_epochs: [30, 50, 120]
+  mlp_decay_rate: 0.1
+
+recorder:
+  name: base
+  save_all_models: False
+  save_csv: True

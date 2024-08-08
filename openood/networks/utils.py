@@ -7,6 +7,7 @@ import torch.nn as nn
 # from mmcls.apis import init_model
 
 import openood.utils.comm as comm
+import pdb
 
 from .bit import KNOWN_MODELS
 from .conf_branch_net import ConfBranchNet
@@ -36,14 +37,44 @@ from .udg_net import UDGNet
 from .vit_b_16 import ViT_B_16
 from .wrn import WideResNet
 from .rts_net import RTSNet
-from .palm_net import PALMNet
+# vision language models
+from .clip_coop import CoOp
+from .clip_fixed import FixedCLIP
+from .clip_fixed_ood_prompt import FixedCLIP_OODPrompt, FixedCLIP_NegOODPrompt
+from .clip_fixed_ood_prompt_localfeat import FixedCLIP_OODPrompt_Localfeat, FixedCLIP_NegOODPrompt_Localfeat
+from .clip_coop_oodprompt import CoOp_OneOODPrompt
+from .clip_coop_negprompt import CoOp_NegOODPrompt
+from .clip_maple import Maple
+from .clip_maple_oodprompt import Maple_OneOODPrompt
 
+def check_size_mismatches(net, checkpoint_path):
+    # 加载检查点的状态字典
+    checkpoint_dict = torch.load(checkpoint_path)
+
+    # 遍历模型的参数
+    for name, param in net.state_dict().items():
+        if name in checkpoint_dict:
+            checkpoint_param = checkpoint_dict[name]
+            # 检查大小是否匹配
+            if param.size() != checkpoint_param.size():
+                print(f"Size mismatch for {name}: model {param.size()}, checkpoint {checkpoint_param.size()}")
+        else:
+            print(f"{name} is missing in checkpoint.")
 
 def get_network(network_config):
 
     num_classes = network_config.num_classes
 
-    if network_config.name == 'resnet18_32x32':
+    if hasattr(network_config, 'modification') and network_config.modification == 't2fnorm':
+        network_config.modification = 'none'
+        backbone = get_network(network_config)
+        backbone.fc = nn.Identity()
+
+        net = T2FNormNet(backbone=backbone,
+                         tau=network_config.tau,
+                         num_classes=num_classes)
+
+    elif network_config.name == 'resnet18_32x32':
         net = ResNet18_32x32(num_classes=num_classes)
 
     elif network_config.name == 'resnet18_256x256':
@@ -66,6 +97,37 @@ def get_network(network_config):
                          widen_factor=10,
                          dropRate=0.0,
                          num_classes=num_classes)
+
+    elif network_config.name == 'coop':
+        net = CoOp(network_config)
+        
+    elif network_config.name == 'coop_oneoodprompt':
+        net = CoOp_OneOODPrompt(network_config)
+
+    elif network_config.name == 'coop_negoodprompt':
+        net = CoOp_NegOODPrompt(network_config)
+
+    elif network_config.name == 'maple':
+        net = Maple(network_config)
+
+    elif network_config.name == 'maple_oneoodprompt':
+        net = Maple_OneOODPrompt(network_config)
+    
+    elif network_config.name == 'fixedclip':
+        net = FixedCLIP(network_config)
+
+    elif network_config.name == 'fixedclip_oodprompt':
+        net = FixedCLIP_OODPrompt(network_config)
+
+    elif network_config.name == 'fixedclip_negoodprompt':
+        net = FixedCLIP_NegOODPrompt(network_config)
+
+    elif network_config.name == 'fixedclip_oodprompt_localfeat':
+        net = FixedCLIP_OODPrompt_Localfeat(network_config)
+
+    elif network_config.name == 'fixedclip_negoodprompt_localfeat':
+        net = FixedCLIP_NegOODPrompt_Localfeat(network_config)
+
 
     elif network_config.name == 'densenet':
         net = DenseNet3(depth=100,
@@ -116,26 +178,6 @@ def get_network(network_config):
                        head=network_config.head,
                        feat_dim=network_config.feat_dim,
                        num_classes=num_classes)
-
-    elif network_config.name == 't2fnorm_net':
-        network_config.backbone.num_gpus = 1
-        backbone = get_network(network_config.backbone)
-
-        net = T2FNormNet(backbone=backbone, num_classes=num_classes)
-
-    elif network_config.name == 'palm_net':
-        # don't wrap ddp here cuz we need to modify
-        # backbone
-        network_config.backbone.num_gpus = 1
-        backbone = get_network(network_config.backbone)
-        # remove fc otherwise ddp will
-        # report unused params
-        backbone.fc = nn.Identity()
-
-        net = PALMNet(backbone=backbone,
-                      head=network_config.head,
-                      feat_dim=network_config.feat_dim,
-                      num_classes=num_classes)
 
     elif network_config.name == 'npos_net':
         # don't wrap ddp here cuz we need to modify
@@ -393,11 +435,18 @@ def get_network(network_config):
                 net.load_state_dict(torch.load(network_config.checkpoint),
                                     strict=False)
             except RuntimeError:
-                # sometimes fc should not be loaded
+                # pdb.set_trace()
+                check_size_mismatches(net, network_config.checkpoint)
+                # if training ood and test ood number are different, the prefix and suffix number may different.
                 loaded_pth = torch.load(network_config.checkpoint)
-                loaded_pth.pop('fc.weight')
-                loaded_pth.pop('fc.bias')
+                loaded_pth.pop('model.prompt_learner.ood_token_prefix')
+                loaded_pth.pop('model.prompt_learner.ood_token_suffix')
                 net.load_state_dict(loaded_pth, strict=False)
+                # # sometimes fc should not be loaded
+                # loaded_pth = torch.load(network_config.checkpoint)
+                # loaded_pth.pop('fc.weight')
+                # loaded_pth.pop('fc.bias')
+                # net.load_state_dict(loaded_pth, strict=False)
         print('Model Loading {} Completed!'.format(network_config.name))
 
     if network_config.num_gpus > 1:

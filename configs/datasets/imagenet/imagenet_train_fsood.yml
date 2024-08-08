@@ -1,0 +1,85 @@
+dataset:
+  name: imagenet
+  num_classes: 1000
+  pre_size: 256
+  image_size: 224
+
+  interpolation: bicubic # following clip.
+  normalization_type: clip ## imagenet | clip.
+
+  num_workers: '@{num_workers}'
+  num_gpus: '@{num_gpus}'
+  num_machines: '@{num_machines}'
+
+  split_names: [train, val, test]
+
+  train:
+    dataset_class: ImglistDataset
+    data_dir: ./data/images_largescale/
+    imglist_pth: ./data/benchmark_imglist/imagenet/train_imagenet.txt
+    batch_size: 128
+    few_shot: 16
+    randseed: 0
+    shuffle: True
+  val:
+    dataset_class: ImglistDataset
+    data_dir: ./data/images_largescale/
+    imglist_pth: ./data/benchmark_imglist/imagenet/val_imagenet.txt
+    batch_size: 256
+    shuffle: False
+  test:
+    dataset_class: ImglistDataset
+    data_dir: ./data/images_largescale/
+    imglist_pth: ./data/benchmark_imglist/imagenet/test_imagenet.txt
+    batch_size: 256
+    shuffle: False
+
+ood_dataset:
+  name: imagenet_ood
+  num_classes: 1000
+
+  dataset_class: ImglistDataset
+  interpolation: bicubic
+  normalization_type: clip
+  batch_size: 256
+  shuffle: False # for Test time method, shuffle is performed in the trainer, please verify.
+
+  pre_size: 256
+  image_size: 224
+  num_workers: '@{num_workers}'
+  num_gpus: '@{num_gpus}'
+  num_machines: '@{num_machines}'
+  split_names: [val, nearood, farood, csid]
+  val:
+    data_dir: ./data/images_largescale/
+    imglist_pth: ./data/benchmark_imglist/imagenet/test_ninco.txt
+  nearood:
+    datasets: [ssb_hard, ninco]
+    ssb_hard:
+      data_dir: ./data/images_largescale/
+      imglist_pth: ./data/benchmark_imglist/imagenet/test_ssb_hard.txt
+    ninco:
+      data_dir: ./data/images_largescale/
+      imglist_pth: ./data/benchmark_imglist/imagenet/test_ninco.txt
+  farood:
+    datasets: [inaturalist, textures, openimageo]
+    textures:
+      data_dir: ./data/images_classic/
+      imglist_pth: ./data/benchmark_imglist/imagenet/test_textures.txt
+    inaturalist:
+      data_dir: ./data/images_largescale/
+      imglist_pth: ./data/benchmark_imglist/imagenet/test_inaturalist.txt
+    openimageo:
+      data_dir: ./data/images_largescale/
+      imglist_pth: ./data/benchmark_imglist/imagenet/test_openimage_o.txt
+  csid:
+    datasets: [imagenetv2, imagenetc, imagenetr] 
+    imagenetv2:
+      data_dir: ./data/images_largescale/
+      imglist_pth: ./data/benchmark_imglist/imagenet/test_imagenet_v2.txt
+    imagenetc:
+      data_dir: ./data/images_largescale/
+      imglist_pth: ./data/benchmark_imglist/imagenet/test_imagenet_c.txt
+    imagenetr:
+      data_dir: ./data/images_largescale/
+      imglist_pth: ./data/benchmark_imglist/imagenet/test_imagenet_r.txt

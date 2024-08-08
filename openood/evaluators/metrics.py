@@ -7,7 +7,7 @@ def compute_all_metrics(conf, label, pred):
     recall = 0.95
     auroc, aupr_in, aupr_out, fpr = auc_and_fpr_recall(conf, label, recall)
 
-    accuracy = acc(pred, label)
+    accuracy = acc(pred, label) # only calculate the in-domain accuracy.
 
     results = [fpr, auroc, aupr_in, aupr_out, accuracy]
 

@@ -23,7 +23,7 @@ class CIDERNet(nn.Module):
             self.head = nn.Sequential(nn.Linear(feature_size, feature_size),
                                       nn.ReLU(inplace=True),
                                       nn.Linear(feature_size, feat_dim))
-
+                                      
     def forward(self, x):
         feat = self.backbone(x).squeeze()
         unnorm_features = self.head(feat)
