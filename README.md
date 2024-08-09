@@ -1,3 +1,16 @@
+# OpenOOD-VLM: Benchmarking Generalized OOD Detection with Vision-Language Models
+
+We release the **official codes** of our works for OOD detection with Vision-Language Models, including:
+> - [x] [ECCV2024: LAPT: Label-driven Automated Prompt Tuning for OOD Detection with Vision-Language Models](https://arxiv.org/pdf/2407.08966) with [Bash](scripts/ood/lapt/test.sh) and [Checkpoint](https://drive.google.com/file/d/1uHvqAraQDBuc_IjbqyLgSdjFDxesTAA7/view?usp=sharing)
+</details>
+
+We will also reproduce some interesting works for OOD detection with Vision-Language Models, including:
+> - [x] NIPS2022: Delving into out-of-distribution detection with vision-language representations. To add
+> - [x] ICLR2024: Negative Label Guided OOD Detection with Pretrained Vision-Language Models. To add
+</details>
+
+Our work is build on the OpenOOD benchmark, thanks for their nice work!
+
 # OpenOOD: Benchmarking Generalized OOD Detection
 
 

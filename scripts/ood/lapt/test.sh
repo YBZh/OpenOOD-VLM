@@ -22,7 +22,9 @@ weight_decay=0.
 optimizer=sgd
 # N_CTX  should be identical to CTX_INIT !!!
 # ./data/benchmark_imglist/imagenet/train_imagenet.txt///./data/benchmark_imglist/imagenet/train_imagenet_idood_last1k_syn2.txt \
+# --network.checkpoint ./lapt_exp/debug_oodval_dedup_scratch/imagenet_coop_negoodprompt_oodmixup_idood_sgd_e10_lr0.01_alpha1_beta0_wccm_ood1000_w1-1-1-1_multice_sgdlr0.01_wd0.000/s10/best.ckpt \
 # --evaluator.name fsood_clip \
+# to conduct experiments with datasets of OpenOOD, please change: imagenet_traditional_four_ood.yml to other configs.
 group_num=100
 random_permute=True
 for seed in 0 
@@ -41,7 +43,7 @@ do
             --network.backbone.CSC False \
             --network.backbone.N_CTX 4 \
             --network.pretrained True \
-            --network.checkpoint ./lapt_exp/debug_oodval_dedup_scratch/imagenet_coop_negoodprompt_oodmixup_idood_sgd_e10_lr0.01_alpha1_beta0_wccm_ood1000_w1-1-1-1_multice_sgdlr0.01_wd0.000/s10/best.ckpt \
+            --network.checkpoint ./DOWNLOADED_CHECKPOINT.ckpt \
             --evaluator.name ood_clip \
             --postprocessor.name oneoodprompt \
             --postprocessor.APS_mode False \
