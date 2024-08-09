@@ -14,4 +14,4 @@ postprocessor:
     in_score: sum
     samada: True
   postprocessor_sweep:
-    tau_list: [0.7, 1, 1.5]
+    tau_list: [0.5, 1, 1.5, 2.0, 3.0, 5.0]

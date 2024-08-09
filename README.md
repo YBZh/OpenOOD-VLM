@@ -5,7 +5,7 @@ We release the **official codes** of our works for OOD detection with Vision-Lan
 </details>
 
 We will also reproduce some interesting works for OOD detection with Vision-Language Models, including:
-> - [x] NIPS2022: Delving into out-of-distribution detection with vision-language representations. To add
+> - [x] [NIPS2022: Delving into out-of-distribution detection with vision-language representations](https://arxiv.org/pdf/2211.13445) with [Bash](scripts/ood/mcm/official.sh)
 > - [x] [ICLR2024: Negative Label Guided OOD Detection with Pretrained Vision-Language Models](https://arxiv.org/pdf/2403.20078)  with [Bash](scripts/ood/neglabel/official.sh)
 </details>
 
