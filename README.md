@@ -2,11 +2,11 @@
 
 This repository release the **official codes** of our works for out-of-distribution detection with **Vision-Language Models**. For reference, we also reproduce some representative methods of OOD detection.
 
-## Updates
+## 🔥 News
 - **23 Aug, 2024**: [LAPT](https://arxiv.org/pdf/2407.08966) is accepted by ECCV 2024, you can easily reproduce our results with [Bash](scripts/ood/lapt/test.sh) and [Checkpoint](https://drive.google.com/file/d/1uHvqAraQDBuc_IjbqyLgSdjFDxesTAA7/view?usp=sharing)
 
 
-## Dependencies and Installation
+## ⚙️ Dependencies and Installation
 <details>
   <summary>Follow OpenOOD to set up the environment, or use our provided instructions below.</summary>
 
@@ -14,7 +14,7 @@ This repository release the **official codes** of our works for out-of-distribut
 
 </details>
 
-## Datasets
+## 📷 Datasets
 We also follow OpenOOD to manage the training and testing datasets.
 If you only use our evaluator, the benchmarks for evaluation will be automatically downloaded by the evaluator (again check out this [tutorial](https://colab.research.google.com/drive/1tvTpCM1_ju82Yygu40fy7Lc0L1YrlkQF?usp=sharing)). If you would like to also use OpenOOD-VLM for training, you can get all data with our [downloading script](https://github.com/Jingkang50/OpenOOD/tree/main/scripts/download). Note that ImageNet-1K training images should be downloaded from its official website.
 
@@ -64,7 +64,7 @@ Our codebase accesses the datasets from `./data/` and pretrained models from `./
 >      > Covariate-Shifted ID: `ImageNet-C`, `ImageNet-R`, `ImageNet-v2`;
 </details>
 
-## Training/Testing
+## 🚀 Training/Testing
 We provide training and evaluation scripts for all the methods we support in [scripts folder](https://github.com/YBZH/OpenOOD-VLM/tree/main/scripts).
 
 - [`ECCV2024 Official`] [LAPT]((https://arxiv.org/pdf/2407.08966)) with pre-trained [Checkpoint](https://drive.google.com/file/d/1uHvqAraQDBuc_IjbqyLgSdjFDxesTAA7/view?usp=sharing)
@@ -107,7 +107,7 @@ We will also reproduce some interesting works for OOD detection with Vision-Lang
 
 
 
-## Citation
+## 📖 Citation
 If you find our repository useful for your research, please consider citing our paper:
 ```bibtex
 
@@ -121,6 +121,9 @@ If you find our repository useful for your research, please consider citing our 
 
 ```
 
+## 🙏 Acknowledgement
+
+- [OpenOOD](https://github.com/Jingkang50/OpenOOD), an extensible codebase with Vision Models only.
 
 
 

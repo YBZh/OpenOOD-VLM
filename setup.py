@@ -4,15 +4,15 @@ with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name='openood',
-    version='1.5',
+    name='openood-vlm',
+    version='1.0',
     author='openood dev team',
-    author_email='jingkang001@e.ntu.edu.sg',
+    author_email='ybzhang815@gmail.com',
     description=
     'This package provides a unified test platform for Out-of-Distribution detection.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/Jingkang50/OpenOOD',
+    url='https://github.com/YBZH/OpenOOD-VLM',
     packages=setuptools.find_packages(),
     install_requires=[
         'torch>=1.13.1', 'torchvision>=0.13', 'scikit-learn', 'json5',
