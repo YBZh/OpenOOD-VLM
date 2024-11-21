@@ -1,0 +1,68 @@
+dataset:
+  name: covid
+  split_names: [train, val, test]
+  interpolation: bicubic # following clip.
+  normalization_type: clip ## imagenet | clip.
+  num_classes: 2
+  pre_size: 224
+  image_size: 224
+  num_workers: '@{num_workers}'
+  num_gpus: '@{num_gpus}'
+  num_machines: '@{num_machines}'
+  train:
+    dataset_class: ImglistDataset
+    data_dir: ./data/images_classic/
+    imglist_pth: ./data/benchmark_imglist/covid/train_bimcv.txt
+    batch_size: 128
+    few_shot: 2
+    randseed: 0
+    shuffle: True
+    interpolation: bicubic
+  val:
+    dataset_class: ImglistDataset
+    data_dir: ./data/images_classic/
+    imglist_pth: ./data/benchmark_imglist/covid/val_bimcv.txt
+    batch_size: 200
+    shuffle: False
+    interpolation: bicubic
+  test:
+    dataset_class: ImglistDataset
+    data_dir: ./data/images_classic/
+    imglist_pth: ./data/benchmark_imglist/covid/test_bimcv.txt
+    batch_size: 200
+    shuffle: False
+    interpolation: bicubic
+
+ood_dataset:
+  name: covid_ood
+  dataset_class: ImglistDataset
+
+  interpolation: bicubic
+  normalization_type: clip
+
+  batch_size: 128
+  shuffle: False
+  num_classes: 2
+  pre_size: 224
+  image_size: 224
+  num_workers: '@{num_workers}'
+  num_gpus: '@{num_gpus}'
+  num_machines: '@{num_machines}'
+
+  split_names: [val, nearood, farood]
+  val:
+    data_dir: ./data/images_classic/
+    imglist_pth: ./data/benchmark_imglist/covid/val_ct.txt
+  nearood:
+    datasets: [ct, xraybone]
+    ct:
+      data_dir: ./data/images_classic/
+      imglist_pth: ./data/benchmark_imglist/covid/test_ct.txt
+    xraybone:
+      data_dir: ./data/images_classic/
+      imglist_pth: ./data/benchmark_imglist/covid/test_xraybone.txt
+  farood:
+    datasets: [ct]
+    ct:
+      data_dir: ./data/images_classic/
+      imglist_pth: ./data/benchmark_imglist/covid/test_ct.txt

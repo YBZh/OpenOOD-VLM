@@ -10,7 +10,7 @@ random_permute=True
 #         --config configs/datasets/imagenet/imagenet_train_fsood.yml \
 for in_score in sum
 do
-    for group_num in 100
+    for group_num in 100 10 1
     do
         python main.py \
         --config configs/datasets/imagenet/imagenet_traditional_four_ood.yml \
@@ -36,7 +36,7 @@ do
         --postprocessor.postprocessor_args.in_score ${in_score}  \
         --num_gpus 1 --num_workers 6 \
         --merge_option merge \
-        --output_dir ./debug_neglabel_official/ \
+        --output_dir ./reimp_neglabel/ \
         --mark ${in_score}_beta${beta}_neg10k_group_num_${group_num}_random_${random_permute}_official
     done
 done

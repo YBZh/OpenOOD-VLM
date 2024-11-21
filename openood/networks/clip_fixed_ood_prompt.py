@@ -521,8 +521,6 @@ def get_selected_ood_text_list(dataset='imagenet', total_ood_num=1000):
     print('total_ood_num is:', total_ood_num)
     #######################################
     foot_path = '/home/notebook/code/personal/S9052995/syn_pro/OpenOOD/data/txtfiles_output/'
-    selected_adj_noun_path = foot_path + dataset + '_selected_adj_noun_0.95_'+ str(total_ood_num) + '_dedup.pth'
-    unselected_adj_noun_path = foot_path + dataset + '_unselected_adj_noun_0.95_' + str(total_ood_num) + '_dedup.pth'
 
     wordnet_processed_path = foot_path + 'wordnet_' + dataset + '_cossim_dedup.pth'
     if os.path.exists(wordnet_processed_path):
@@ -570,6 +568,8 @@ def get_selected_ood_text_list(dataset='imagenet', total_ood_num=1000):
     print('actual length of selected adj texts', len(selected_adj_text))
     print('actual length of selected noun texts', len(selected_noun_text))
 
+    selected_adj_noun_path = foot_path + dataset + '_selected_adj_noun_0.95_'+ str(total_ood_num) + '_dedup.pth'
+    unselected_adj_noun_path = foot_path + dataset + '_unselected_adj_noun_0.95_' + str(total_ood_num) + '_dedup.pth'
     save_dict = {
         'adj': selected_adj_text,
         'noun': selected_noun_text
@@ -649,7 +649,7 @@ def get_text_features_neg(model, dataset, text_prompt, text_center, ood_number):
         text_features_unselected = text_features_neg
         # text_features_unselected = []
         # for classname in tqdm(unselected_adj_text):
-        #     texts = [template.format(classname) for template in templates]  # format with class
+        #     texts = [template.format(classname) for template in adj_imagenet_template]  # format with class
         #     texts = clip.tokenize(texts).cuda()  # tokenize
         #     class_embeddings = model.encode_text(texts)  # embed with text encoder
         #     class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
@@ -675,9 +675,9 @@ def get_text_features_neg(model, dataset, text_prompt, text_center, ood_number):
         text_features_unselected = torch.stack(text_features_unselected, dim=1).cuda() # 512*1000  or  torch.Size([7, 10000, 512])
         text_features_neg = torch.stack(text_features_neg, dim=1).cuda() # 512*1000  or  torch.Size([7, 10000, 512])
 
-    text_features_all = torch.cat((text_features, text_features_neg), dim=1)
+    text_features_id_ood = torch.cat((text_features, text_features_neg), dim=1)
     # pdb.set_trace()
-    return text_features_all, text_features_unselected
+    return text_features_id_ood, text_features_unselected
 
 
 class FixedCLIP_NegOODPrompt(nn.Module):
@@ -698,12 +698,12 @@ class FixedCLIP_NegOODPrompt(nn.Module):
         print("Turning off gradients in both the image and the text encoder")
         for name, param in clip_model.named_parameters():
             param.requires_grad_(False) ## fix clip model.
-        # pdb.set_trace()
+        # text_features: feat_dim * text_num
         self.text_features, self.text_features_unselected = get_text_features_neg(self.model, cfg.backbone.dataset, cfg.backbone.text_prompt, cfg.backbone.text_center, cfg.backbone.ood_number)
         
-        print('get the text features of SUN classes for visualization.')
-        self.sun_features = get_text_features_sun(self.model, cfg.backbone.dataset, cfg.backbone.text_prompt)
-        # self.text_features_unselected = torch.cat((self.text_features, self.text_features_unselected), dim=1)  ## 512* (11k + 80k)
+        # print('get the text features of SUN classes for visualization.')
+        # self.sun_features = get_text_features_sun(self.model, cfg.backbone.dataset, cfg.backbone.text_prompt)
+        self.text_features_all = torch.cat((self.text_features, self.text_features_unselected), dim=1)  ## 512* (11k + 80k)
 
 
     def forward(self, x, return_feat=False):

@@ -729,16 +729,14 @@ class CustomCLIP(nn.Module):
 
     def forward(self, image, return_feat):
         image_features = self.image_encoder(image.type(self.dtype)) ##128*512
-        ## 如果是测试状态，那么下面三行只forward 一次
-        # prompts = self.prompt_learner() # torch.Size([1000, 77, 512])
-        # tokenized_prompts = self.tokenized_prompts  ## 1000*77
-        # text_features = self.text_encoder(prompts, tokenized_prompts) # 1000*512
         if not self.training and self.text_features is not None:
-            text_features = self.text_features  ## accrelating testing. 
+                text_features = self.text_features  ## accrelating testing. 
             # self.prompts = self.prompt_learner()  # torch.Size([1000, 77, 512])
             # self.tokenized_prompts = self.tokenized_prompts  # 1000*77
             # self.text_features = self.text_encoder(self.prompts, self.tokenized_prompts)
         else:
+            # pdb.set_trace()
+            print('re-calculate the text feature with learned prompts.')
             prompts = self.prompt_learner() # torch.Size([1000, 77, 512])
             tokenized_prompts = self.tokenized_prompts  ## 1000*77
             text_features = self.text_encoder(prompts, tokenized_prompts) # 1000*512
@@ -874,9 +872,9 @@ class CoOp_NegOODPrompt(nn.Module):
     def __init__(self, cfg):
         super().__init__()
         classnames = get_class_names(cfg.backbone.dataset) # imagenet 
-        self.n_cls = len(classnames) + int(cfg.backbone.OOD_NUM)
+        self.n_cls = len(classnames) 
         # pdb.set_trace()
-        self.n_output = self.n_cls 
+        self.n_output = self.n_cls + int(cfg.backbone.OOD_NUM)
 
         # templates = get_templates(cfg.backbone.text_prompt) # simple
         backbone = cfg.backbone.name # 'ViT-B/16'

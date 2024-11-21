@@ -41,10 +41,11 @@ from .rts_postprocessor import RTSPostprocessor
 from .gen_postprocessor import GENPostprocessor
 from .relation_postprocessor import RelationPostprocessor
 from .mcm_postprocessor import MCMPostprocessor
-from .ttaprompt_postprocessor import TTAPromptPostprocessor, TTAPromptLocalfeatPostprocessor, GroupTTAPromptPostprocessor
+from .ttaprompt_postprocessor import TTAPromptPostprocessor, TTAPromptLocalfeatPostprocessor, TTAPromptPostprocessor_noadagap
 from .oneoodprompt_postprocessor import OneOodPromptPostprocessor, OneOodPromptDevelopPostprocessor
 from .she_oneoodprompt_postprocessor import SHEOneOodPromptPostprocessor
 from .knn_oneoodprompt_postprocessor import KnnOneOodPromptPostprocessor
+from .label_relationship_postprocessor import LabelRelationPostprocessor
 
 
 
@@ -96,8 +97,9 @@ def get_postprocessor(config: Config):
         'sheoneoodprompt': SHEOneOodPromptPostprocessor,
         'knnoneoodprompt': KnnOneOodPromptPostprocessor,
         'ttaprompt': TTAPromptPostprocessor,
-        'ttapromptgroup': GroupTTAPromptPostprocessor,
-        'ttapromptlocalfeat': TTAPromptLocalfeatPostprocessor
+        'ttapromptnoadagap': TTAPromptPostprocessor_noadagap,
+        'ttapromptlocalfeat': TTAPromptLocalfeatPostprocessor,
+        'labelrelationship': LabelRelationPostprocessor
     }
 
     return postprocessors[config.postprocessor.name](config)

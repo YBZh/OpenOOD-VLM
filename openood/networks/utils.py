@@ -438,6 +438,7 @@ def get_network(network_config):
                 # pdb.set_trace()
                 check_size_mismatches(net, network_config.checkpoint)
                 # if training ood and test ood number are different, the prefix and suffix number may different.
+                print('tackling the mismatch of prompt_learner.ood_token_prefix and ood_token_suffix')
                 loaded_pth = torch.load(network_config.checkpoint)
                 loaded_pth.pop('model.prompt_learner.ood_token_prefix')
                 loaded_pth.pop('model.prompt_learner.ood_token_suffix')

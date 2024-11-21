@@ -3,6 +3,8 @@
 This repository release the **official codes** of our works for out-of-distribution detection with **Vision-Language Models**. For reference, we also reproduce some representative methods of OOD detection.
 
 ## 🔥 News
+- **21 Nov, 2024**: [AdaNeg](https://arxiv.org/pdf/2410.20149) is accepted by NeurIPS 2024, you can easily reproduce our results with [Bash](scripts/ood/adaneg/)
+
 - **23 Aug, 2024**: [LAPT](https://arxiv.org/pdf/2407.08966) is accepted by ECCV 2024, you can easily reproduce our results with [Bash](scripts/ood/lapt/test.sh) and [Checkpoint](https://drive.google.com/file/d/1uHvqAraQDBuc_IjbqyLgSdjFDxesTAA7/view?usp=sharing)
 
 
@@ -67,6 +69,12 @@ Our codebase accesses the datasets from `./data/` and pretrained models from `./
 ## 🚀 Training/Testing
 We provide training and evaluation scripts for all the methods we support in [scripts folder](https://github.com/YBZH/OpenOOD-VLM/tree/main/scripts).
 
+- [`NeurIPS Official`] [AdaNeg]((https://arxiv.org/pdf/2410.20149)) 
+```sh
+sh scripts/ood/adaneg/imagenet.sh
+sh scripts/ood/adaneg/plus_LAPT.sh # Apply AdaNeg to the pre-trained LAPT prompt
+```
+
 - [`ECCV2024 Official`] [LAPT]((https://arxiv.org/pdf/2407.08966)) with pre-trained [Checkpoint](https://drive.google.com/file/d/1uHvqAraQDBuc_IjbqyLgSdjFDxesTAA7/view?usp=sharing)
 
 ```sh
@@ -118,6 +126,12 @@ If you find our repository useful for your research, please consider citing our 
   year={2024}
 }
 
+@article{zhang2024adaneg,
+  title={AdaNeg: Adaptive Negative Proxy Guided OOD Detection with Vision-Language Models},
+  author={Zhang, Yabin and Zhang, Lei},
+  journal={Conference on Neural Information Processing Systems},
+  year={2024}
+}
 
 ```
 

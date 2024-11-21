@@ -56,7 +56,7 @@ path="./data/images_largescale/Places/images/"
 save_path="./data/benchmark_imglist/imagenet/test_places.txt"
 prefix="Places/images/"
 files=os.listdir(path)
-with open(save_path,'a') as f:
+with open(save_path,'w') as f:
     for file in files:
         line=prefix+file+" -1\n"
         f.write(line)
@@ -66,7 +66,7 @@ path="./data/images_largescale/SUN/images/"
 save_path="./data/benchmark_imglist/imagenet/test_sun.txt"
 prefix="SUN/images/"
 files=os.listdir(path)
-with open(save_path,'a') as f:
+with open(save_path,'w') as f:
     for file in files:
         line=prefix+file+" -1\n"
         f.write(line)
