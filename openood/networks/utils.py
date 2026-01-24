@@ -41,6 +41,8 @@ from .rts_net import RTSNet
 from .clip_coop import CoOp
 from .clip_fixed import FixedCLIP
 from .clip_fixed_ood_prompt import FixedCLIP_OODPrompt, FixedCLIP_NegOODPrompt
+from .clip_fixed_ood_prompt_openclip import FixedCLIP_OODPrompt_OpenCLIP, FixedCLIP_NegOODPrompt_OpenCLIP   
+from .clip_fixed_aaneg import FixedCLIP_NegOODPrompt_Fullcorpus
 from .clip_fixed_ood_prompt_localfeat import FixedCLIP_OODPrompt_Localfeat, FixedCLIP_NegOODPrompt_Localfeat
 from .clip_coop_oodprompt import CoOp_OneOODPrompt
 from .clip_coop_negprompt import CoOp_NegOODPrompt
@@ -121,6 +123,15 @@ def get_network(network_config):
 
     elif network_config.name == 'fixedclip_negoodprompt':
         net = FixedCLIP_NegOODPrompt(network_config)
+
+    elif network_config.name == 'fixedclip_oodprompt_openclip':
+        net = FixedCLIP_OODPrompt_OpenCLIP(network_config)
+
+    elif network_config.name == 'fixedclip_negoodprompt_openclip':
+        net = FixedCLIP_NegOODPrompt_OpenCLIP(network_config)
+
+    elif network_config.name == 'fixedclip_negoodprompt_fullcorpus':
+        net = FixedCLIP_NegOODPrompt_Fullcorpus(network_config)
 
     elif network_config.name == 'fixedclip_oodprompt_localfeat':
         net = FixedCLIP_OODPrompt_Localfeat(network_config)

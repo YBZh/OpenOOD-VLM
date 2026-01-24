@@ -4,15 +4,12 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-# import clip
-from openood.networks.clip import clip
-from openood.networks.clip.simple_tokenizer import SimpleTokenizer as _Tokenizer
+import open_clip
 from openood.networks.clip_for_wordnet_prepare import generate_cossim_idname_wordnet_dedup
 import ipdb
 import pdb
 import json, os
 
-_tokenizer = _Tokenizer()
 imagenet_classes = [
     'tench', 'goldfish', 'great white shark', 'tiger shark',
     'hammerhead shark', 'electric ray', 'stingray', 'rooster', 'hen',
@@ -427,24 +424,43 @@ def get_templates(text_prompt):
     else:
         raise NotImplementedError
 
-def load_clip_to_cpu(backbone_name):
-    url = clip._MODELS[backbone_name]
-    model_path = clip._download(url)
-    try:
-        # loading JIT archive
-        model = torch.jit.load(model_path, map_location="cpu").eval()
-        state_dict = None
-    except RuntimeError:
-        state_dict = torch.load(model_path, map_location="cpu")
-    model = clip.build_model(state_dict or model.state_dict())
-    
-    # ipdb.set_trace()
-    return model
+def _map_to_openclip_name(backbone_name: str) -> str:
+    # Map OpenAI-style names to OpenCLIP-style names
+    name_map = {
+        'ViT-B/32': 'ViT-B-32',
+        'ViT-B/16': 'ViT-B-16',
+        'ViT-L/14': 'ViT-L-14',
+        'ViT-L/14@336px': 'ViT-L-14-336',
+        'RN50': 'RN50',
+        'RN101': 'RN101'
+    }
+    return name_map.get(backbone_name, backbone_name)
+
+def load_openclip_model_and_tokenizer(backbone_name: str, pretrained: str = None):
+    """
+    Create an OpenCLIP model and tokenizer on CPU; caller moves to CUDA.
+    If pretrained is None, choose a sensible default per backbone.
+    """
+    oc_name = _map_to_openclip_name(backbone_name)
+    # Default pretrained checkpoints for common backbones
+    default_pretrained = {
+        'ViT-B-32': 'laion2b_s34b_b79k',
+        'ViT-B-16': 'laion2b_s34b_b88k',
+        'ViT-L-14': 'laion2b_s32b_b82k',
+        'ViT-L-14-336': 'laion2b_s32b_b82k',
+        'RN50': 'openai',
+        'RN101': 'openai',
+    }
+    pretrained_name = pretrained or default_pretrained.get(oc_name, 'openai')
+    model, _, _ = open_clip.create_model_and_transforms(oc_name, pretrained=pretrained_name)
+    tokenizer = open_clip.get_tokenizer(oc_name)
+    model.eval()
+    return model, tokenizer
 
 
 
 # https://github.com/openai/CLIP/blob/main/notebooks/Prompt_Engineering_for_ImageNet.ipynb
-def get_text_features(model, dataset, text_prompt):
+def get_text_features(model, dataset, text_prompt, tokenizer):
     classnames = get_class_names(dataset) # imagenet --> imagenet class names
     templates = get_templates(text_prompt) # simple --> text prompt for each classes. 
     print('adopt text prompt of', text_prompt)
@@ -458,7 +474,7 @@ def get_text_features(model, dataset, text_prompt):
             #     f = open('./openood/networks/clip/gpt3_prompts/' + cupl_file)
             #     cupl_prompts = json.load(f)
             #     texts += cupl_prompts[classname]
-            texts = clip.tokenize(texts).cuda()  # tokenize
+            texts = tokenizer(texts).cuda()  # tokenize
             class_embeddings = model.encode_text(texts)  # embed with text encoder
             class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
             class_embedding = class_embeddings.mean(dim=0)
@@ -473,7 +489,7 @@ def get_text_features(model, dataset, text_prompt):
     return text_features
 
 # only for visualization, get the text features of SUN dataset
-def get_text_features_sun(model, dataset, text_prompt):
+def get_text_features_sun(model, dataset, text_prompt, tokenizer):
     classnames = sun397_classes
     templates = get_templates(text_prompt) # simple --> text prompt for each classes. 
     print('adopt text prompt of', text_prompt)
@@ -487,7 +503,7 @@ def get_text_features_sun(model, dataset, text_prompt):
             #     f = open('./openood/networks/clip/gpt3_prompts/' + cupl_file)
             #     cupl_prompts = json.load(f)
             #     texts += cupl_prompts[classname]
-            texts = clip.tokenize(texts).cuda()  # tokenize
+            texts = tokenizer(texts).cuda()  # tokenize
             class_embeddings = model.encode_text(texts)  # embed with text encoder
             class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
             class_embedding = class_embeddings.mean(dim=0)
@@ -503,25 +519,24 @@ def get_text_features_sun(model, dataset, text_prompt):
 
 
 ########################################### compared to FixedCLIP_NegOODPrompt, FixedCLIP_OODPrompt not use any negative text. 
-class FixedCLIP_OODPrompt(nn.Module):
+class FixedCLIP_OODPrompt_OpenCLIP(nn.Module):
     def __init__(self, cfg):
         super().__init__()
-        backbone = cfg.backbone.name # 'ViT-B/16'
-        assert backbone in clip.available_models()
+        backbone = cfg.backbone.name # e.g., 'ViT-B/16'
         classnames = get_class_names(cfg.backbone.dataset) # imagenet 
         self.n_cls = len(classnames)
         # pdb.set_trace()
         self.n_output = self.n_cls + 10000
-        # clip_model, self.preprocess = clip.load(backbone, device='cuda')
-        print(f"Loading CLIP (backbone: {backbone})")
-        clip_model = load_clip_to_cpu(backbone)
+        print(f"Loading OpenCLIP (backbone: {backbone})")
+        clip_model, tokenizer = load_openclip_model_and_tokenizer(backbone_name=backbone, pretrained=getattr(cfg.backbone, 'pretrained', None))
         clip_model = clip_model.cuda()
         self.model = clip_model
+        self.tokenizer = tokenizer
         self.logit_scale = clip_model.logit_scale.data
         print("Turning off gradients in both the image and the text encoder")
         for name, param in clip_model.named_parameters():
             param.requires_grad_(False) ## fix clip model.
-        self.text_features = get_text_features(self.model, cfg.backbone.dataset, cfg.backbone.text_prompt)
+        self.text_features = get_text_features(self.model, cfg.backbone.dataset, cfg.backbone.text_prompt, self.tokenizer)
 
 
     def forward(self, x, return_feat=False):
@@ -613,7 +628,7 @@ def get_selected_ood_text_list(dataset='imagenet', total_ood_num=1000):
 
 
 # https://github.com/openai/CLIP/blob/main/notebooks/Prompt_Engineering_for_ImageNet.ipynb
-def get_text_features_neg(model, dataset, text_prompt, text_center, ood_number):
+def get_text_features_neg(model, dataset, text_prompt, text_center, ood_number, tokenizer):
     classnames = get_class_names(dataset) # imagenet --> imagenet class names
     templates = get_templates(text_prompt) # simple --> text prompt for each classes. 
     print('the noun template is set as:', templates)
@@ -626,7 +641,7 @@ def get_text_features_neg(model, dataset, text_prompt, text_center, ood_number):
             #     f = open('./openood/networks/clip/gpt3_prompts/' + cupl_file)
             #     cupl_prompts = json.load(f)
             #     texts += cupl_prompts[classname]
-            texts = clip.tokenize(texts).cuda()  # tokenize
+            texts = tokenizer(texts).cuda()  # tokenize
             class_embeddings = model.encode_text(texts)  # embed with text encoder
             class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True) # N*D
             if text_center:
@@ -649,7 +664,7 @@ def get_text_features_neg(model, dataset, text_prompt, text_center, ood_number):
         print('the adj template is set as:', adj_imagenet_template)
         for classname in tqdm(selected_adj_text):
             texts = [template.format(classname) for template in adj_imagenet_template]  # format with class
-            texts = clip.tokenize(texts).cuda()  # tokenize
+            texts = tokenizer(texts).cuda()  # tokenize
             class_embeddings = model.encode_text(texts)  # embed with text encoder
             class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
             if text_center:
@@ -661,7 +676,7 @@ def get_text_features_neg(model, dataset, text_prompt, text_center, ood_number):
         print('the noun template is set as:', templates)
         for classname in tqdm(selected_noun_text):
             texts = [template.format(classname) for template in templates]  # format with class
-            texts = clip.tokenize(texts).cuda()  # tokenize
+            texts = tokenizer(texts).cuda()  # tokenize
             class_embeddings = model.encode_text(texts)  # embed with text encoder
             class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
             if text_center:
@@ -677,7 +692,7 @@ def get_text_features_neg(model, dataset, text_prompt, text_center, ood_number):
         text_features_unselected = []
         for classname in tqdm(unselected_adj_text):
             texts = [template.format(classname) for template in adj_imagenet_template]  # format with class
-            texts = clip.tokenize(texts).cuda()  # tokenize
+            texts = tokenizer(texts).cuda()  # tokenize
             class_embeddings = model.encode_text(texts)  # embed with text encoder
             class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
             if text_center:
@@ -689,7 +704,7 @@ def get_text_features_neg(model, dataset, text_prompt, text_center, ood_number):
 
         for classname in tqdm(unselected_noun_text):
             texts = [template.format(classname) for template in templates]  # format with class
-            texts = clip.tokenize(texts).cuda()  # tokenize
+            texts = tokenizer(texts).cuda()  # tokenize
             class_embeddings = model.encode_text(texts)  # embed with text encoder
             class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
             if text_center:
@@ -707,7 +722,7 @@ def get_text_features_neg(model, dataset, text_prompt, text_center, ood_number):
     return text_features_id_ood, text_features_unselected
 
 
-class FixedCLIP_NegOODPrompt(nn.Module):
+class FixedCLIP_NegOODPrompt_OpenCLIP(nn.Module):
     def __init__(self, cfg):
         super().__init__()
         backbone = cfg.backbone.name # 'ViT-B/16'
@@ -715,22 +730,28 @@ class FixedCLIP_NegOODPrompt(nn.Module):
         self.n_cls = len(classnames)
         # pdb.set_trace()
         self.n_output = self.n_cls + 10000
-        assert backbone in clip.available_models()
-        # clip_model, self.preprocess = clip.load(backbone, device='cuda')
-        print(f"Loading CLIP (backbone: {backbone})")
-        clip_model = load_clip_to_cpu(backbone)
+        print(f"Loading OpenCLIP (backbone: {backbone})")
+        clip_model, tokenizer = load_openclip_model_and_tokenizer(backbone_name=backbone, pretrained=getattr(cfg.backbone, 'pretrained', None))
         clip_model = clip_model.cuda()
         self.model = clip_model
+        self.tokenizer = tokenizer
         self.logit_scale = clip_model.logit_scale.data
         print("Turning off gradients in both the image and the text encoder")
         for name, param in clip_model.named_parameters():
             param.requires_grad_(False) ## fix clip model.
         
         # text_features: feat_dim * text_nums
-        self.text_features, self.text_features_unselected = get_text_features_neg(self.model, cfg.backbone.dataset, cfg.backbone.text_prompt, cfg.backbone.text_center, cfg.backbone.ood_number)
+        self.text_features, self.text_features_unselected = get_text_features_neg(
+            self.model,
+            cfg.backbone.dataset,
+            cfg.backbone.text_prompt,
+            cfg.backbone.text_center,
+            cfg.backbone.ood_number,
+            self.tokenizer
+        )
         
         # print('get the text features of SUN classes for visualization.')
-        # self.sun_features = get_text_features_sun(self.model, cfg.backbone.dataset, cfg.backbone.text_prompt)
+        # self.sun_features = get_text_features_sun(self.model, cfg.backbone.dataset, cfg.backbone.text_prompt, self.tokenizer)
         self.text_features_all = torch.cat((self.text_features, self.text_features_unselected), dim=1)  ## 512* (11k + 80k)
         gaussian_noise_image = torch.randn((3, 3, 224, 224), dtype=torch.float).cuda()  ## Gaussian Noise
         gaussian_noise_image = (gaussian_noise_image - gaussian_noise_image.min()) / (gaussian_noise_image.max() - gaussian_noise_image.min())

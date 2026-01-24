@@ -360,13 +360,29 @@ class OODEvaluatorClipTTA(OODEvaluator):
         print(f'Processing {ood_split}...', flush=True)
         # [id_pred, id_conf, id_gt] = id_list
         metrics_list = []
-        # postprocessor.reset_memory()  ## here, we inherit the memory with the same near/far OOD group; using more information, not fair
+        postprocessor.reset_memory()  ## here, we inherit the memory with the same near/far OOD group; using more information, not fair
         for dataset_name, ood_dl in ood_data_loaders[ood_split].items():
+            # print('the memorized feature from previous OOD dataset is not emptied.')
             postprocessor.reset_memory()  ## here, we reset the memory for each OOD datasets.
             print(f'Performing inference on {dataset_name} dataset...', flush=True)
             # merging the id dataloader and ood dataloader! 
             # pdb.set_trace()
-            combined_dataset = ConcatDataset([id_loader.dataset, ood_dl.dataset])
+            postprocessor.setup(net, id_loader, ood_dl)
+            # # 从 id_loader.dataset 和 ood_dl.dataset 中随机选取一定比例的样本，而不是全部选用
+            # id_ratio = 0.5    # 可以调整这里的比例
+            # ood_ratio = id_ratio   # 例如0.5, 只采样一半样本
+
+            # # 随机采样ID数据集
+            # id_indices = np.random.choice(len(id_loader.dataset), int(len(id_loader.dataset) * id_ratio), replace=False)
+            # # 随机采样OOD数据集
+            # ood_indices = np.random.choice(len(ood_dl.dataset), int(len(ood_dl.dataset) * ood_ratio), replace=False)
+            # # 采样子集
+            # from torch.utils.data import Subset
+            # id_subset = Subset(id_loader.dataset, id_indices)
+            # ood_subset = Subset(ood_dl.dataset, ood_indices)
+
+            # combined_dataset = ConcatDataset([id_subset, ood_subset])
+            combined_dataset = ConcatDataset([ood_dl.dataset, id_loader.dataset])
             if fsood and 'csid' in ood_data_loaders.keys():
                 print(f'concating ID, CSID, and OOD dataset', flush=True)
                 for dataset_name_csid, csid in ood_data_loaders['csid'].items():
@@ -376,6 +392,11 @@ class OODEvaluatorClipTTA(OODEvaluator):
             # Create a new DataLoader from the combined dataset. The shuffle operation is verified
             combined_dataloader = DataLoader(combined_dataset, batch_size=id_loader.batch_size, num_workers=id_loader.num_workers, shuffle=True)
             pred, conf, label = postprocessor.inference(net, combined_dataloader) 
+            # activation_id_ood = {
+            #     "id": postprocessor.score_from_pos,
+            #     "ood": postprocessor.score_from_neg
+            # }
+            # torch.save(activation_id_ood, "activation_id_ood_" + dataset_name + '.pth')
             # mydict = {'conf': conf, 'label': label}
             # torch.save(mydict, 'ssbhard_conf.pth')
             # pdb.set_trace()

@@ -11,7 +11,7 @@ dataset:
   num_machines: '@{num_machines}'
   train:
     dataset_class: ImglistDataset
-    data_dir: ./data/images_classic/
+    data_dir: ./data/images_medical/bimcv/
     imglist_pth: ./data/benchmark_imglist/covid/train_bimcv.txt
     batch_size: 128
     few_shot: 2
@@ -20,14 +20,14 @@ dataset:
     interpolation: bicubic
   val:
     dataset_class: ImglistDataset
-    data_dir: ./data/images_classic/
+    data_dir: ./data/images_medical/bimcv/
     imglist_pth: ./data/benchmark_imglist/covid/val_bimcv.txt
     batch_size: 200
     shuffle: False
     interpolation: bicubic
   test:
     dataset_class: ImglistDataset
-    data_dir: ./data/images_classic/
+    data_dir: ./data/images_medical/bimcv/
     imglist_pth: ./data/benchmark_imglist/covid/test_bimcv.txt
     batch_size: 200
     shuffle: False
@@ -51,18 +51,18 @@ ood_dataset:
 
   split_names: [val, nearood, farood]
   val:
-    data_dir: ./data/images_classic/
+    data_dir: ./data/images_medical/ct/
     imglist_pth: ./data/benchmark_imglist/covid/val_ct.txt
   nearood:
     datasets: [ct, xraybone]
     ct:
-      data_dir: ./data/images_classic/
+      data_dir: ./data/images_medical/ct/
       imglist_pth: ./data/benchmark_imglist/covid/test_ct.txt
     xraybone:
-      data_dir: ./data/images_classic/
+      data_dir: ./data/images_medical/xraybone/
       imglist_pth: ./data/benchmark_imglist/covid/test_xraybone.txt
   farood:
     datasets: [ct]
     ct:
-      data_dir: ./data/images_classic/
+      data_dir: ./data/images_medical/ct/
       imglist_pth: ./data/benchmark_imglist/covid/test_ct.txt

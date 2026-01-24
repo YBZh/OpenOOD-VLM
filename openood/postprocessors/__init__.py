@@ -40,3 +40,4 @@ from .rankfeat_postprocessor import RankFeatPostprocessor
 from .gen_postprocessor import GENPostprocessor
 from .nnguide_postprocessor import NNGuidePostprocessor
 from .relation_postprocessor import RelationPostprocessor
+from .activated_neg_postprocessor import ActivatedNegPostprocessor

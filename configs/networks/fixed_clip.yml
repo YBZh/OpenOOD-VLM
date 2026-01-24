@@ -19,3 +19,4 @@ network:
     pretrained: False
     checkpoint: none
     num_gpus: '@{num_gpus}'
+    corpus: neglabel_wordnet

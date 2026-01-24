@@ -46,6 +46,8 @@ from .oneoodprompt_postprocessor import OneOodPromptPostprocessor, OneOodPromptD
 from .she_oneoodprompt_postprocessor import SHEOneOodPromptPostprocessor
 from .knn_oneoodprompt_postprocessor import KnnOneOodPromptPostprocessor
 from .label_relationship_postprocessor import LabelRelationPostprocessor
+from .activated_neg_postprocessor import ActivatedNegPostprocessor
+from .activated_neg_postprocessor_sigclip import ActivatedNegPostprocessor_SigClip
 
 
 
@@ -99,7 +101,9 @@ def get_postprocessor(config: Config):
         'ttaprompt': TTAPromptPostprocessor,
         'ttapromptnoadagap': TTAPromptPostprocessor_noadagap,
         'ttapromptlocalfeat': TTAPromptLocalfeatPostprocessor,
-        'labelrelationship': LabelRelationPostprocessor
+        'labelrelationship': LabelRelationPostprocessor,
+        'actneg': ActivatedNegPostprocessor,
+        'actnegsigclip': ActivatedNegPostprocessor_SigClip
     }
 
     return postprocessors[config.postprocessor.name](config)

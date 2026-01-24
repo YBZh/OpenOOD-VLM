@@ -42,35 +42,41 @@ path="./data/images_largescale/dtd/images/"
 save_path="./data/benchmark_imglist/imagenet/test_dtd.txt"
 prefix="dtd/images/"
 classes=os.listdir(path)
+valid_extensions = {'.jpg', '.jpeg', '.png'}
 with open(save_path,'w') as f:
     for cla in classes:
         used_prefix = prefix + cla 
         cla_path = path + cla
         files = os.listdir(cla_path)
         for file in files:
-            line=used_prefix+ '/' +file+" -1\n"
-            f.write(line)
+            ext = os.path.splitext(file)[1].lower()
+            if ext in valid_extensions:
+                line=used_prefix+ '/' +file+" -1\n"
+                f.write(line)
+            else:
+                line=used_prefix+ '/' +file+" -1\n" 
+                print(line)
     f.close()  
 
-path="./data/images_largescale/Places/images/"
-save_path="./data/benchmark_imglist/imagenet/test_places.txt"
-prefix="Places/images/"
-files=os.listdir(path)
-with open(save_path,'w') as f:
-    for file in files:
-        line=prefix+file+" -1\n"
-        f.write(line)
-    f.close()  
+# path="./data/images_largescale/Places/images/"
+# save_path="./data/benchmark_imglist/imagenet/test_places.txt"
+# prefix="Places/images/"
+# files=os.listdir(path)
+# with open(save_path,'w') as f:
+#     for file in files:
+#         line=prefix+file+" -1\n"
+#         f.write(line)
+#     f.close()  
 
-path="./data/images_largescale/SUN/images/"
-save_path="./data/benchmark_imglist/imagenet/test_sun.txt"
-prefix="SUN/images/"
-files=os.listdir(path)
-with open(save_path,'w') as f:
-    for file in files:
-        line=prefix+file+" -1\n"
-        f.write(line)
-    f.close()  
+# path="./data/images_largescale/SUN/images/"
+# save_path="./data/benchmark_imglist/imagenet/test_sun.txt"
+# prefix="SUN/images/"
+# files=os.listdir(path)
+# with open(save_path,'w') as f:
+#     for file in files:
+#         line=prefix+file+" -1\n"
+#         f.write(line)
+#     f.close()  
 
 
 # path="./data/images_classic/cifar100c"

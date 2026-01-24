@@ -84,7 +84,7 @@ def Deduplication(listone, listtwo):
 def generate_cossim_idname_wordnet_dedup(classnames, save_path):
     print('starting generating cosine similarity with ID classnames and wordnet names..........')
 
-    path="/home/notebook/code/personal/S9052995/syn_pro/OpenOOD/data/txtfiles"
+    path="./data/txtfiles"
     # save_path="/home/notebook/code/personal/S9052995/syn_pro/OpenOOD/data/txtfiles/wordnet_imagenet_cossim_dedup.pth"
     prompts = ["The nice " + name + "." for name in classnames]
     # prompts = [name for name in classnames]
@@ -196,6 +196,55 @@ def generate_cossim_idname_wordnet_dedup(classnames, save_path):
 
     torch.save(save_dict, save_path)
 
+
+
+def load_corpus_dataset(classnames, corpus_dataset):
+    
+
+    path="./data/corpus_datasets/" + corpus_dataset
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"direction {path} not exist")
+
+    # prompts = ["The nice " + name + "." for name in classnames]
+    # # prompts = [name for name in classnames]
+    # tokenized_prompts = torch.cat([clip.tokenize(p) for p in prompts]).cuda()
+
+    text_files = os.listdir(path)
+    adj_list = []
+    noun_list = []
+
+    for text_file in text_files:
+        if text_file[:3] == 'adj' and text_file[-3:] == 'txt':
+            file_path = os.path.join(path, text_file)
+            try:
+                with open(file_path, 'r') as file:
+                    text = file.read()
+            except FileNotFoundError:
+                print(f"The file {file_path} was not found. Please make sure the file path is correct.")
+            adj_list += text.split('\n')[:-1]
+        elif text_file[:4] == 'noun' and text_file[-3:] == 'txt':
+            file_path = os.path.join(path, text_file)
+            try:
+                with open(file_path, 'r') as file:
+                    text = file.read()
+            except FileNotFoundError:
+                print(f"The file {file_path} was not found. Please make sure the file path is correct.")
+            noun_list += text.split('\n')[:-1]
+        else:
+            print('skip a not text file', text_file)
+    adj_list = list(set(adj_list))
+    noun_list = list(set(noun_list))
+    print('length of adj words', len(adj_list))
+    print('length of noun words', len(noun_list))
+
+    adj_list = Deduplication(adj_list, classnames)
+    noun_list = Deduplication(noun_list, classnames)
+    print('length of adj words after image dedup', len(adj_list))
+    print('length of noun words after image dedup', len(noun_list))
+    adj_list = Deduplication(adj_list, noun_list)  ## when a word is both a noun and a adj, remain the noun only.   make no influence, but cost much time.
+    print('length of adj words after noun dedup', len(adj_list))
+
+    return noun_list, adj_list
 
 
 
