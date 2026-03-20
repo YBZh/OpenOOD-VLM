@@ -75,6 +75,11 @@ sh scripts/ood/adaneg/imagenet.sh
 sh scripts/ood/adaneg/plus_LAPT.sh # Apply AdaNeg to the pre-trained LAPT prompt
 ```
 
+- [`CVPR2026`] [ANTS]((https://arxiv.org/abs/2509.03951)) 
+```sh
+sh scripts/ood/ants/imagenet.sh
+```
+
 - [`ECCV2024 Official`] [LAPT]((https://arxiv.org/pdf/2407.08966)) with pre-trained [Checkpoint](https://drive.google.com/file/d/1uHvqAraQDBuc_IjbqyLgSdjFDxesTAA7/view?usp=sharing)
 
 ```sh
@@ -133,6 +138,12 @@ If you find our repository useful for your research, please consider citing our 
   year={2024}
 }
 
+@article{zhu2025ants,
+  title={ANTS: Adaptive Negative Textual Space Shaping for OOD Detection via Test-Time MLLM Understanding and Reasoning},
+  author={Zhu, Wenjie and Zhang, Yabin and Jin, Xin and Zeng, Wenjun and Zhang, Lei},
+  journal={arXiv preprint arXiv:2509.03951},
+  year={2025}
+}
 ```
 
 ## 🙏 Acknowledgement
