@@ -3,6 +3,8 @@
 This repository release the **official codes** of our works for out-of-distribution detection with **Vision-Language Models**. For reference, we also reproduce some representative methods of OOD detection.
 
 ## 🔥 News
+- **20 Mar, 2026**: [ANTS](https://arxiv.org/abs/2509.03951) is accepted by CVPR 2026, you can easily reproduce our results with [Bash](scripts/ood/ants)
+
 - **21 Nov, 2024**: [AdaNeg](https://arxiv.org/pdf/2410.20149) is accepted by NeurIPS 2024, you can easily reproduce our results with [Bash](scripts/ood/adaneg/)
 
 - **23 Aug, 2024**: [LAPT](https://arxiv.org/pdf/2407.08966) is accepted by ECCV 2024, you can easily reproduce our results with [Bash](scripts/ood/lapt/test.sh) and [Checkpoint](https://drive.google.com/file/d/1uHvqAraQDBuc_IjbqyLgSdjFDxesTAA7/view?usp=sharing)
