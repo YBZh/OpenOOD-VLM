@@ -2,7 +2,7 @@
 
 This repository release the **official codes** of our works on out-of-distribution detection with **Vision-Language Models**. We also reproduce some representative methods for reference. 
 
-**The code is well organized, therefore you can easily develop new algorithms by modifies ONLY ONE python file!!**
+**The code is well organized, therefore you can easily develop new algorithms by modifying ONLY ONE python file!!**
 
 ## 🔥 News
 - **20 Mar, 2026**: [TANL](https://arxiv.org/pdf/2603.25250) is accepted by CVPR 2026, you can easily reproduce our results with [Bash](scripts/ood/TANL)
